@@ -1,18 +1,37 @@
 import requests
 from selenium import webdriver
 import time
+import os
+import json
 
 #init webdriver with Chrome
 driver = webdriver.Chrome()
 url = "https://passport.bilibili.com/login"
 
-#manually login
 driver.get(url)
-tmp = input("press any key to continue after you logged in.")
+if os.path.exists('bilibili.cookie'):
+    #automatically login
+    with open('bilibili.cookie', 'r') as f:
+        js = f.read()
+        cookies = json.loads(js)
+        f.close()
+    for i in cookies:
+        print(i)
+        driver.add_cookie(i)
+    driver.get(url)
+    input("it should be logged in. if there's something wrong, please manually fix it.")
+else:    
+    #manually login
+    input("press any key to continue after you logged in.")
+    cookies = driver.get_cookies()
+    js = json.dumps(cookies)
+    with open('bilibili.cookie', 'w') as f:
+        f.write(js)
+        f.close()
 
 
 #access bilibili timeline
-time.sleep(2)
+time.sleep(1)
 url = "https://t.bilibili.com/?spm_id_from=333.851.b_696e7465726e6174696f6e616c486561646572.28"
 driver.get(url)
 time.sleep(2)
